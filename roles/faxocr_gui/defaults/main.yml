@@ -1,0 +1,5 @@
+---
+# defaults file for roles/faxocr_gui
+devel_login_name: devel
+devel_group_name: devel
+devel_home: /home/devel/

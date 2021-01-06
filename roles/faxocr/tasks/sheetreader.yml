@@ -1,0 +1,57 @@
+---
+- block:
+    - name: install pacakges to build software
+      import_tasks: buildenv.yml
+
+    - name: import imagemagick.yml that sheetreader requires to run
+      import_tasks: imagemagick.yml
+
+    - name: set libmysqlclient-dev package names
+      set_fact:
+        _sheetreader_libmysqlclient_dev_package: default-libmysqlclient-dev
+      when:
+        - ansible_distribution == 'Debian' and ansible_distribution_major_version is version(9, '>=')
+
+    - name: install packages required by sheetreader
+      apt:
+        name:
+          - "{{ _sheetreader_libmysqlclient_dev_package | default('libmysqlclient-dev') }}"
+          - gocr
+
+    - name: sheetreader git cloning
+      git:
+        repo: "{{ sheetreader_repository }}"
+        dest: "{{ sheetreader_root }}"
+        version: "{{ sheetreader_branch }}"
+        accept_hostkey: true
+      ignore_errors: true
+
+    - name: sheetreader configure
+      command: ./configure CFLAGS=-O3
+      args:
+        chdir: "{{ sheetreader_root }}"
+
+    - name: sheetreader make
+      make:
+        chdir: "{{ sheetreader_root }}"
+
+    - name: sheetreader install
+      make:
+        chdir: "{{ sheetreader_root }}"
+        target: install
+
+    - name: sheetreader cleanup
+      make:
+        chdir: "{{ sheetreader_root }}"
+        target: distclean
+
+    - name: change file owner of sheetreader directory
+      file:
+        path: "{{ sheetreader_root }}"
+        state: directory
+        owner: "{{ faxocr_login_name }}"
+        group: "{{ faxocr_group_name }}"
+        recurse: yes
+
+  tags:
+    - sheetreader

@@ -1,0 +1,26 @@
+---
+- block:
+    - name: set branch name to master on older environment
+      set_fact:
+        faxocr_branch: master
+      when:
+        - faxocr_branch is not defined
+        - ansible_distribution == 'Ubuntu' and ansible_distribution_major_version == '12' or
+          ansible_distribution == 'Debian' and ansible_distribution_major_version == '7'
+
+    - name: set branch name to develop-5 on newer environment
+      set_fact:
+        faxocr_branch: develop-5
+      when:
+        - faxocr_branch is not defined
+        - ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version(14, '>=') or
+          ansible_distribution == 'Debian' and ansible_distribution_major_version is version(8, '>=')
+
+    - name: check whether faxocr_branch name is set
+      assert:
+        that: faxocr_branch is defined
+        fail_msg: faxocr_branch variable is not set, specify it or check playbook's code
+
+  tags:
+    - faxocr
+    - gui

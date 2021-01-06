@@ -1,0 +1,12 @@
+---
+- name: set pdftools package name
+  set_fact:
+    _pdftools_package:
+      - poppler-utils
+  when:
+    - faxocr_branch is defined
+    - faxocr_branch | regex_replace('^.*develop-(\\d+).*$', '\\1') | int() >= 4
+
+- name: install pdf tools packages
+  apt:
+    name: "{{ _pdftools_package | default('pdftk') }}"

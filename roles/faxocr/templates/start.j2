@@ -1,0 +1,9 @@
+#!/bin/sh
+
+sudo service rsyslog start
+sudo service cron start
+sudo service postfix start
+sudo service mysql start
+sudo service apache2 start
+(cd $HOME/rails && bundle exec rails server -b '0.0.0.0' > /dev/null &)
+tail -f /dev/null

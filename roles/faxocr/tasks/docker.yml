@@ -1,0 +1,22 @@
+---
+- block:
+    - name: install startup script for services on docker container
+      template:
+        dest: /start
+        src: start.j2
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: "{{ faxocr_login_name }} user can sudo without password"
+      template:
+        dest: /etc/sudoers.d/{{ faxocr_login_name }}
+        src: sudoers-nopassword.j2
+        owner: root
+        group: root
+        mode: '0640'
+      vars:
+        sudo_user: "{{ faxocr_login_name }}"
+
+  tags:
+    - docker

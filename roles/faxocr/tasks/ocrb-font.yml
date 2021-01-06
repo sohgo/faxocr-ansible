@@ -1,0 +1,42 @@
+---
+- block:
+    - name: create .fonrts directory in faxocr user
+      file:
+        dest: "{{ faxocr_home }}.fonts"
+        state: directory
+        owner: "{{ faxocr_login_name }}"
+        group: "{{ faxocr_group_name }}"
+        mode: 0755
+
+    - name: install OCRB font
+      command:
+        argv:
+          - cp
+          - '-p'
+          - "{{ faxocr_home }}etc/OCRB.ttf"
+          - "{{ faxocr_home }}.fonts/OCRB.ttf"
+
+    - name: change file mode of OCRB font
+      file:
+        dest: "{{ faxocr_home }}.fonts/OCRB.ttf"
+        mode: 0444
+
+    - name: install conf files for OCRB fonts
+      template:
+        dest: /etc/fonts/conf.avail/09-faxocr-ocrb.conf
+        src: 09-faxocr-ocrb.conf.j2
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: create symbolic links for OCRB font config file
+      file:
+        dest: /etc/fonts/conf.d/{{ item }}
+        src: /etc/fonts/conf.avail/{{ item }}
+        state: link
+      with_items:
+        - 09-faxocr-ocrb.conf
+      notify: update font cache
+
+  tags:
+    - ocrb

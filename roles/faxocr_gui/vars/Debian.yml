@@ -1,0 +1,6 @@
+---
+desktop_package:
+  - task-lxde-desktop
+web_browser_package:
+  - firefox-esr-l10n-ja
+web_browser_desktop_file: firefox-esr.desktop

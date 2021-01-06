@@ -1,0 +1,10 @@
+---
+- hosts: all
+  become: no
+  gather_facts: no
+  roles:
+    - docker
+  vars:
+    rails_env: development
+  vars_files:
+    - inventory/host_vars/secret.yml

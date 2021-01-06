@@ -1,0 +1,24 @@
+---
+- block:
+    - name: srhelper make
+      make:
+        chdir: "{{ srhelper_root }}"
+
+    - name: srhelper install
+      make:
+        chdir: "{{ srhelper_root }}"
+        target: install
+
+    - name: srhelper cleanup
+      make:
+        chdir: "{{ srhelper_root }}"
+        target: clean
+
+    - name: change file owner of srhelper command
+      file:
+        path: "{{ srhelper_root }}../../bin/srhelper"
+        owner: "{{ faxocr_login_name }}"
+        group: "{{ faxocr_group_name }}"
+
+  tags:
+    - srhelper

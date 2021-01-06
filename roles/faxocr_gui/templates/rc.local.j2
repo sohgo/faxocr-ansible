@@ -1,0 +1,3 @@
+#!/bin/sh
+
+su - '{{ devel_login_name }}' -c 'cd {{ devel_home }}faxocr/rails && exec bundle exec rails server > /dev/null 2>&1 < /dev/null &'

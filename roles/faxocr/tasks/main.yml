@@ -1,0 +1,33 @@
+---
+- import_tasks: faxocr-branch.yml
+
+# 3rd party software
+- import_tasks: package.yml
+- import_tasks: parallel.yml
+- import_tasks: fonts.yml
+- import_tasks: imagemagick.yml
+- import_tasks: wkhtmltopdf.yml
+- include_tasks: bizfax.yml
+  when: faxocr_branch == 'master'
+
+# faxocr
+- import_tasks: faxocr.yml
+- import_tasks: ocrb-font.yml
+- import_tasks: cluscore.yml
+- import_tasks: kocr.yml
+- import_tasks: sheetreader.yml
+- import_tasks: srhelper.yml
+- import_tasks: rails.yml
+
+- import_tasks: fetchmail.yml
+- import_tasks: crontab.yml
+
+# mail server
+- import_tasks: procmail.yml
+
+# web server
+- import_tasks: apache-conf.yml
+
+# for docker container
+- include_tasks: docker.yml
+  when: ansible_connection == 'docker'

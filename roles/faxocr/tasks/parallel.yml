@@ -1,0 +1,44 @@
+---
+- name: install gnu parallel package
+  apt:
+    name:
+      - parallel
+  when:
+    - ansible_distribution != 'Ubuntu' or ansible_distribution_major_version is version(12, '>')
+  tags:
+    - parallel
+
+- block:
+    - name: install bzip2 package
+      apt:
+        name:
+          - bzip2
+
+    - name: install pacakges to build software
+      import_tasks: buildenv.yml
+
+    - name: download gnu parallel package
+      get_url:
+        url: "{{ parallel_url }}"
+        dest: "{{ parallel_dest_dir }}/{{ parallel_archive }}"
+
+    - name: extract {{ parallel_archive }}
+      unarchive:
+        src: "{{ parallel_dest_dir }}/{{ parallel_archive }}"
+        dest: "{{ parallel_dest_dir }}"
+        remote_src: yes
+
+    - name: parallel configure
+      command: ./configure
+      args:
+        chdir: "{{ parallel_root }}"
+
+    - name: parallel make install
+      make:
+        chdir: "{{ parallel_root }}"
+        target: install
+  when:
+    - ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version(12, '<=')
+
+  tags:
+    - parallel

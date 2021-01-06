@@ -1,0 +1,6 @@
+[submodule "roles/geerlingguy_mysql"]
+	path = roles/geerlingguy_mysql
+	url = https://github.com/geerlingguy/ansible-role-mysql
+[submodule "roles/mrlesmithjr_postfix"]
+	path = roles/mrlesmithjr_postfix
+	url = https://github.com/mrlesmithjr/ansible-postfix

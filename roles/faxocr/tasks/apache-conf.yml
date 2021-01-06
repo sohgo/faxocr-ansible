@@ -1,0 +1,55 @@
+---
+- block:
+    - name: include OS-specific variables
+      include_vars: "{{ item }}"
+      with_first_found:
+        - files:
+            - apache-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml
+            - apache-{{ ansible_distribution }}.yml
+            - apache-{{ ansible_os_family }}.yml
+          skip: true
+
+    - name: install apache package
+      apt:
+        name:
+          - apache2
+          - libapache2-mod-passenger
+
+    - name: get installed version of Apache
+      command: apachectl -v
+      changed_when: false
+      check_mode: false
+      register: _apache_version
+
+    - name: create apache_version variable
+      set_fact:
+        apache_version: "{{ _apache_version.stdout.split()[2].split('/')[1] }}"
+
+    - name: install faxocr.conf for apache
+      template:
+        dest: /etc/apache2/sites-available/faxocr.conf
+        src: apache-faxocr.conf.j2
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart apache
+
+    - name: enable faxocr.conf for apache
+      command: a2ensite faxocr.conf
+      notify: restart apache
+
+    - name: disenable 000-default.conf for apache
+      command:
+        argv:
+          - a2dissite
+          - "{{ apache.default_conf | default('000-default.conf') }}"
+      notify: restart apache
+
+    - name: apache2 service state
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+
+  tags:
+    - apache-conf

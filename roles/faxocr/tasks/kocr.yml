@@ -1,0 +1,64 @@
+---
+- block:
+    - name: install pacakges to build software
+      import_tasks: buildenv.yml
+
+    - name: set opencv package names
+      set_fact:
+        _kocr_opencv_package:
+          - libcv-dev
+          - libcv2.3
+          - libhighgui-dev
+          - libhighgui2.3
+          - libcvaux-dev
+          - libcvaux2.3
+      when:
+        - ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version(14, '<')
+
+    - name: install packages required by kocr
+      apt:
+        name: "{{ _kocr_opencv_package | default('libopencv-dev') }}"
+
+    - name: kocr git cloning
+      git:
+        repo: "{{ kocr_repository }}"
+        dest: "{{ kocr_root }}"
+        version: "{{ kocr_branch }}"
+        accept_hostkey: true
+      ignore_errors: true
+
+    - name: kocr install db
+      make:
+        chdir: "{{ kocr_root }}"
+        target: install-db
+
+    - name: kocr make library
+      make:
+        chdir: "{{ kocr_root }}/src"
+        target: library
+
+    - name: kocr install library
+      make:
+        chdir: "{{ kocr_root }}/src"
+        target: install-library
+
+    - name: kocr install binaries
+      make:
+        chdir: "{{ kocr_root }}/src"
+        target: install
+
+    - name: kocr cleanup
+      make:
+        chdir: "{{ kocr_root }}/src"
+        target: clean
+
+    - name: change file owner of kocr directory
+      file:
+        path: "{{ kocr_root }}"
+        state: directory
+        owner: "{{ faxocr_login_name }}"
+        group: "{{ faxocr_group_name }}"
+        recurse: yes
+
+  tags:
+    - kocr

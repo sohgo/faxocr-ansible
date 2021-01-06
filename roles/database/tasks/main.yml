@@ -1,0 +1,31 @@
+---
+# tasks file for role/database
+- block:
+    - name: set mysql_python_package_debian package name for older environment
+      set_fact:
+        _mysql_python_package_debian: python-mysqldb
+      when: (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version(14, '<=')) or
+            (ansible_distribution == 'Debian' and ansible_distribution_major_version is version(8, '<='))
+
+    - name: set mysql_python_package_debian package name for newer environment
+      set_fact:
+        _mysql_python_package_debian: python3-pymysql
+      when: (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version(18, '>=')) or
+            (ansible_distribution == 'Debian' and ansible_distribution_major_version is version(10, '>='))
+
+    - name: import role of geerlingguy_mysql
+      import_role:
+        name: geerlingguy_mysql
+      vars:
+        mysql_python_package_debian: "{{ _mysql_python_package_debian | default('python3-mysqldb') }}"
+        mysql_root_password: "{{ secret.mysql.password.root }}"
+        mysql_config_include_files:
+          - src: roles/database/templates/faxocr.cnf
+        mysql_users:
+          - name: faxocr
+            password: "{{ secret.mysql.password.faxocr }}"
+            priv: '*.*:ALTER,ALTER ROUTINE,CREATE,CREATE ROUTINE,CREATE TEMPORARY TABLES,CREATE VIEW,DELETE,DROP,EXECUTE,FILE,INDEX,INSERT,LOCK TABLES,PROCESS,RELOAD,SELECT,SHOW VIEW,TRIGGER,UPDATE'
+
+  tags:
+    - database
+    - mysql

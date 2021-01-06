@@ -1,0 +1,7 @@
+---
+desktop_package:
+  - lubuntu-desktop
+  - language-pack-ja
+web_browser_package:
+  - firefox-locale-ja
+web_browser_desktop_file: firefox.desktop

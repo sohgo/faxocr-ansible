@@ -1,0 +1,13 @@
+---
+# defaults file for roles/docker
+docker_container_name: faxocr-aio
+docker_base_image: ubuntu:18.04
+docker_container_hostname: faxocr.local
+docker_exposed_ports:
+  - '25'
+  - '80'
+  - '3000'
+docker_image_version: 5.01
+docker_hub_repository_name: faxocr
+docker_hub_image_name: faxocr-allinone
+docker_hub_image_tag: develop-5

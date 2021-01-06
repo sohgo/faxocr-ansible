@@ -1,0 +1,21 @@
+---
+# tasks file for role/mail_server
+- block:
+    - name: import role of mrlesmithjr_postfix
+      import_role:
+        name: 'mrlesmithjr_postfix'
+      vars:
+        configure_postfix: true
+        postfix_use_tls: no
+        postfix_mynetworks:
+          - '127.0.0.0/8'
+          - '[::ffff:127.0.0.0]/104'
+          - '[::1]/128'
+
+    - name: set compatibility_level
+      command: postconf compatibility_level=2
+      notify: reload postfix
+
+  tags:
+    - mail_server
+    - postfix

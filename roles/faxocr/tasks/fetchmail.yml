@@ -1,0 +1,17 @@
+---
+- block:
+    - name: install fetchmail package
+      apt:
+        name:
+          - fetchmail
+
+    - name: create a empty file of Maildir/fetchmail.log
+      file:
+        path: "{{ faxocr_home }}Maildir/fetchmail.log"
+        state: touch
+        owner: "{{ faxocr_login_name }}"
+        group: "{{ faxocr_group_name }}"
+        mode: 0644
+
+  tags:
+    - fetchmail

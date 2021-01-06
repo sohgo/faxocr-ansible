@@ -1,0 +1,122 @@
+---
+- name: include vars for git cloning
+  include_vars: ../faxocr/defaults/main.yml
+
+- name: create autologin group
+  group:
+    name: autologin
+
+- name: create {{ faxocr_login_name }} user to autologin
+  user:
+    name: "{{ faxocr_login_name }}"
+    groups: autologin
+    append: yes
+
+- name: create directory of /etc/lightdm/lightdm.conf.d
+  file:
+    path: /etc/lightdm/lightdm.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when:
+    ansible_distribution == 'Debian'
+
+- name: autologin as faxocr for lightdm
+  template:
+    dest: /etc/lightdm/lightdm.conf.d/10-autologin.conf
+    src: 10-autologin.conf.j2
+    owner: root
+    group: root
+    mode: 0644
+
+- name: create .config directory
+  file:
+    path: /home/{{ item }}/.config
+    state: directory
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: 0700
+    recurse: yes
+  with_items:
+    - "{{ faxocr_login_name }}"
+    - "{{ devel_login_name }}"
+
+
+- name: create .config/autostart directory
+  file:
+    path: /home/{{ item }}/.config/autostart
+    state: directory
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: 0755
+  with_items:
+    - "{{ faxocr_login_name }}"
+    - "{{ devel_login_name }}"
+
+- name: autostart firefox browser
+  copy:
+    dest: /home/{{ item }}/.config/autostart/{{ web_browser_desktop_file }}
+    src: /usr/share/applications/{{ web_browser_desktop_file }}
+    remote_src: yes
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: '0644'
+  with_items:
+    - "{{ faxocr_login_name }}"
+    - "{{ devel_login_name }}"
+
+- name: set startup url for firefox browser
+  lineinfile:
+    path: /home/{{ item.user }}/.config/autostart/{{ web_browser_desktop_file }}
+    regexp: Exec=.*firefox.* %u
+    line: Exec=firefox http://localhost{{ item.port }}/faxocr/
+  with_items:
+    - user: "{{ faxocr_login_name }}"
+      port: ''
+    - user: "{{ devel_login_name }}"
+      port: ':3000'
+
+- name: create Desktop directory in the home
+  file:
+    path: /home/{{ item }}/Desktop
+    state: directory
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: 0755
+  with_items:
+    - "{{ faxocr_login_name }}"
+    - "{{ devel_login_name }}"
+
+- name: setup desktop icon for FaxOCR
+  template:
+    dest: /home/{{ item.user }}/Desktop/faxocr.desktop
+    src: faxocr.desktop.j2
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+    mode: 0644
+  vars:
+    faxocr_local_url: "{{ item.url }}"
+  with_items:
+    - user: "{{ faxocr_login_name }}"
+      group: "{{ faxocr_group_name }}"
+      url: http://localhost/faxocr
+    - user: "{{ devel_login_name }}"
+      group: "{{ devel_group_name }}"
+      url: http://localhost:3000/faxocr
+
+- name: set crontab for user {{ devel_login_name }}
+  cron:
+    name: start rails
+    special_time: reboot
+    job: "cd {{ devel_home }}faxocr/rails && bundle exec rails server -b '::' > /dev/null 2>&1 < /dev/null &"
+    user: "{{ devel_login_name }}"
+    state: absent
+
+- name: setup to start webrick for {{ devel_login_name }} user in /etc/rc.local
+  template:
+    dest: /etc/rc.local
+    src: rc.local.j2
+    owner: root
+    group: root
+    mode: 0755

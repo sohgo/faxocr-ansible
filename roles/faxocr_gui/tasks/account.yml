@@ -1,0 +1,12 @@
+---
+- name: create devel group
+  group:
+    name: "{{ devel_login_name }}"
+
+- name: create devel user
+  user:
+    name: "{{ devel_login_name }}"
+    group: "{{ devel_group_name }}"
+    groups: sudo,adm
+    shell: /bin/bash
+    password: "{{ secret.system.password.devel }}"

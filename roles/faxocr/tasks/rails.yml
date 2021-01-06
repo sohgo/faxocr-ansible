@@ -1,0 +1,129 @@
+---
+- block:
+    - name: install packages for rails
+      apt:
+        name:
+          - ruby
+          - ruby-dev
+          - nodejs
+
+    - name: set gems package names
+      set_fact:
+        _gems_package:
+          - rubygems
+      when:
+        - ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version(12, '<=')
+
+    - name: install gem packages depending on OS
+      apt:
+        name: "{{ _gems_package }}"
+      when:
+        - _gems_package is defined
+
+    - name: install bundler package
+      apt:
+        name:
+          - ruby-bundler
+      when:
+        - ansible_distribution != 'Ubuntu' or ansible_distribution_major_version is version(12, '>')
+
+    # package version of ruby-bundler on Ubuntu Precise is very slow, it consumes much CPU cycles
+    - name: install bundler 1.17.3
+      gem:
+        name: bundler
+        version: 1.17.3
+        user_install: no
+      when:
+        - ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version(12, '<=')
+
+  tags:
+    - rails
+
+- block:
+    - name: bundle install
+      # command: bundle install --path vendor/bundler
+      command: bundle install
+      args:
+        chdir: "{{ faxocr_home }}rails"
+
+    - name: setup tables of database
+      command: "{{ item }}"
+      args:
+        chdir: "{{ faxocr_home }}rails"
+      with_items:
+        - bundle exec rake db:setup RAILS_ENV=development
+        - env DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rake db:setup RAILS_ENV=production
+      when: setup_mode == 'initial_setup'
+
+    - name: database migration
+      command: "{{ item }}"
+      args:
+        chdir: "{{ faxocr_home }}rails"
+      with_items:
+        - bundle exec rake db:migrate RAILS_ENV=development
+        - bundle exec rake db:migrate RAILS_ENV=production
+      when: setup_mode == 'production_update'
+
+    - name: get installed rails version
+      command: bundle exec rails --version
+      args:
+        chdir: "{{ faxocr_home }}rails"
+      register: _rails_version
+
+    - name: create rails_version variable
+      set_fact:
+        rails_major_minor_version: "{{ _rails_version.stdout.split()[1].split('.')[0:2]|join('.') }}"
+
+    - name: completely precompiling assets
+      command: "{{ item }}"
+      args:
+        chdir: "{{ faxocr_home }}rails"
+      with_items:
+        - bundle exec rake assets:clobber
+        - bundle exec rake assets:precompile
+      when:
+        - setup_mode == 'initial_setup'
+        - rails_major_minor_version is version(3.1, '>=')
+
+    - name: precompiling assets and removed unnecessary ones
+      command: "{{ item }}"
+      args:
+        chdir: "{{ faxocr_home }}rails"
+      with_items:
+        - bundle exec rake assets:precompile
+        - bundle exec rake assets:clean
+      when:
+        - setup_mode == 'production_update'
+        - rails_major_minor_version is version(3.1, '>=')
+
+
+    - name: check whether rails/public/images/ocr exists
+      stat:
+        path: "{{ faxocr_home }}rails/public/images/ocr"
+      register: public_image_dir
+
+    - name: rename rails/public/images/ocr directory to ocr.orig
+      command: mv ocr ocr.orig
+      args:
+        chdir: "{{ faxocr_home }}rails/public/images"
+      register: image_ocr_rename
+      when: public_image_dir.stat.isdir is defined and public_image_dir.stat.isdir
+
+    - name: create a symbolic link to Faxsystem/analyzedimage from rails/public/images/ocr
+      file:
+        src: ../../../Faxsystem/analyzedimage
+        dest: "{{ faxocr_home }}rails/public/images/ocr"
+        state: link
+      when: image_ocr_rename.rc is defined and image_ocr_rename.rc == 0
+
+
+    - name: change file owner of rails directory
+      file:
+        path: "{{ faxocr_home }}rails"
+        state: directory
+        owner: "{{ faxocr_login_name }}"
+        group: "{{ faxocr_group_name }}"
+        recurse: yes
+
+  tags:
+    - rails

@@ -1,0 +1,12 @@
+---
+wkhtmltopdf_archive: wkhtmltox{{ _wkhtmltopdf_version_delimiter }}{{ wkhtmltopdf_version }}{{ _wkhtmltopdf_os_type }}{{ ansible_distribution_release }}{{ _wkhtmltopdf_version_delimiter }}amd64.deb
+wkhtmltopdf_url: https://github.com/wkhtmltopdf/{{ _wkhtmltopdf_packaging }}/releases/download/{{ wkhtmltopdf_version }}/wkhtmltox{{ _wkhtmltopdf_version_delimiter }}{{ wkhtmltopdf_version }}{{ _wkhtmltopdf_os_type }}{{ ansible_distribution_release }}{{ _wkhtmltopdf_version_delimiter }}amd64.deb
+# wkhtmltox-0.12.1_linux-precise-amd64.deb
+# wkhtmltox_0.12.1.4-2.bionic_amd64.deb
+# https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.1/wkhtmltox-0.12.1_linux-precise-amd64.deb
+# https://github.com/wkhtmltopdf/packaging/releases/download/0.12.1.4-2/wkhtmltox_0.12.1.4-2.xenial_amd64.deb
+
+parallel_archive: parallel-{{ parallel_version }}.tar.bz2
+parallel_url: http://ftpmirror.gnu.org/parallel/{{ parallel_archive }}
+parallel_dest_dir: /tmp
+parallel_root: "{{ parallel_dest_dir }}/parallel-{{ parallel_version }}"

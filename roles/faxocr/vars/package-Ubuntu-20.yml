@@ -1,0 +1,4 @@
+---
+faxocr_os_dependent_packages:
+  - php-cli
+  - php-mbstring

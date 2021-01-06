@@ -1,0 +1,3 @@
+---
+faxocr_os_dependent_packages:
+  - php5-cli

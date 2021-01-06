@@ -1,0 +1,10 @@
+---
+# tasks file for roles/docker
+- name: create a docker container for all-in-one faxocr
+  docker_container:
+    name: "{{ docker_container_name }}"
+    image: "{{ docker_base_image }}"
+    hostname: "{{ docker_container_hostname }}"
+    state: started
+    tty: yes
+    exposed_ports: "{{ docker_exposed_ports }}"

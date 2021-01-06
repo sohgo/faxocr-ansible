@@ -1,0 +1,33 @@
+---
+# tasks file for roles/docker
+- delegate_to: localhost
+  block:
+    - name: set ansible_connection to local
+      set_fact:
+        ansible_connection: local
+    - name: import task for creating docker container
+      import_tasks: create-container.yml
+    - name: import task for bootstrap of creating docker container
+      import_tasks: bootstrap.yml
+
+- delegate_to: "{{ docker_container_name }}"
+  block:
+    - name: set ansible_connection to docker
+      set_fact:
+        ansible_connection: docker
+    - name: gather facts for docker container
+      setup:
+    - name: import roles for docker container
+      block:
+        - import_role: name=common
+        - import_role: name=database
+        - import_role: name=mail_server
+        - import_role: name=faxocr
+
+- delegate_to: localhost
+  block:
+    - name: set ansible_connection to local
+      set_fact:
+        ansible_connection: local
+    - name: import task for creating docker image
+      import_tasks: create-image.yml

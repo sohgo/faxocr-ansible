@@ -1,0 +1,54 @@
+---
+- name: include vars for git cloning
+  include_vars: ../faxocr/defaults/main.yml
+
+- name: faxocr git cloning
+  git:
+    repo: "{{ faxocr_repository }}"
+    dest: "{{ devel_home }}faxocr"
+    version: "{{ faxocr_branch }}"
+    track_submodules: no
+    accept_hostkey: true
+  ignore_errors: true
+
+- name: cluscore git cloning
+  git:
+    repo: "{{ cluscore_repository }}"
+    dest: "{{ devel_home }}faxocr/src/cluscore"
+    version: "{{ cluscore_branch }}"
+    accept_hostkey: true
+  ignore_errors: true
+
+- name: kocr git cloning
+  git:
+    repo: "{{ kocr_repository }}"
+    dest: "{{ devel_home }}faxocr/src/kocr"
+    version: "{{ kocr_branch }}"
+    accept_hostkey: true
+  ignore_errors: true
+
+- name: sheetreader git cloning
+  git:
+    repo: "{{ sheetreader_repository }}"
+    dest: "{{ devel_home }}faxocr/src/sheetreader"
+    version: "{{ sheetreader_branch }}"
+    accept_hostkey: true
+  ignore_errors: true
+
+- name: change file owner of faxocr directory for devel user
+  file:
+    path: "{{ devel_home }}faxocr"
+    state: directory
+    owner: "{{ devel_login_name }}"
+    group: "{{ devel_group_name }}"
+    recurse: yes
+    mode: 0755
+
+- name: import tasks of srhelper for devel user
+  include_tasks: roles/faxocr/tasks/srhelper.yml
+  vars:
+    faxocr_home: "{{ devel_home }}faxocr/"
+    faxocr_login_name: "{{ devel_login_name }}"
+    faxocr_group_name: "{{ devel_group_name }}"
+  tags:
+    - srhelper

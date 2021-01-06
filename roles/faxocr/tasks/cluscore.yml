@@ -1,0 +1,47 @@
+---
+- block:
+    - name: install pacakges to build software
+      import_tasks: buildenv.yml
+
+    - name: install packages required by cluscore
+      apt:
+        name:
+          - libxml2-dev
+
+    - name: cluscore git cloning
+      git:
+        repo: "{{ cluscore_repository }}"
+        dest: "{{ cluscore_root }}"
+        version: "{{ cluscore_branch }}"
+        accept_hostkey: true
+      ignore_errors: true
+
+    - name: cluscore make configure
+      command: ./configure
+      args:
+        chdir: "{{ cluscore_root }}"
+
+    - name: cluscore make
+      make:
+        chdir: "{{ cluscore_root }}"
+
+    - name: cluscore make install
+      make:
+        chdir: "{{ cluscore_root }}"
+        target: install
+
+    - name: cluscore make dist-clean
+      make:
+        chdir: "{{ cluscore_root }}"
+        target: distclean
+
+    - name: change file owner of cluscore directory
+      file:
+        path: "{{ cluscore_root }}"
+        state: directory
+        owner: "{{ faxocr_login_name }}"
+        group: "{{ faxocr_group_name }}"
+        recurse: yes
+
+  tags:
+    - cluscore

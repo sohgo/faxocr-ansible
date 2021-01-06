@@ -1,0 +1,22 @@
+---
+- block:
+    - name: install procmail package
+      apt:
+        name:
+          - procmail
+
+    - name: setup .forward and .procmailrc
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ faxocr_home }}{{ item.dst }}"
+        owner: "{{ faxocr_login_name }}"
+        group: "{{ faxocr_group_name }}"
+        mode: '0644'
+      with_items:
+        - src: dot-forward
+          dst: .forward
+        - src: dot-procmailrc
+          dst: .procmailrc
+
+  tags:
+    - procmail

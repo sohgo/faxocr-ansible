@@ -1,0 +1,44 @@
+---
+- block:
+    - name: install cron package
+      apt:
+        name:
+          - cron
+          - rsyslog
+
+    - name: rsyslog service state
+      service:
+        name: rsyslog
+        state: started
+        enabled: yes
+
+    - name: cron service state
+      service:
+        name: cron
+        state: started
+        enabled: yes
+
+    - name: processing fax
+      cron:
+        name: processing fax
+        minute: 0-59/10
+        hour: '*'
+        day: '*'
+        month: '*'
+        weekday: '*'
+        job: "{{ faxocr_home }}bin/procfax.sh >> Faxsystem/Log/cron_procfax.log"
+        user: "{{ faxocr_login_name }}"
+
+    - name: processing reports
+      cron:
+        name: processing reports
+        minute: 0-59/15
+        hour: '*'
+        day: '*'
+        month: '*'
+        weekday: '*'
+        job: "{{ faxocr_home }}bin/procreport.sh >> Faxsystem/Log/cron_procreport.log"
+        user: "{{ faxocr_login_name }}"
+
+  tags:
+    - cron

@@ -1,0 +1,47 @@
+---
+- block:
+    - name: faxocr git cloning
+      git:
+        repo: "{{ faxocr_repository }}"
+        dest: "{{ faxocr_home }}"
+        version: "{{ faxocr_branch }}"
+        track_submodules: no
+        accept_hostkey: true
+      ignore_errors: true
+
+    - name: create faxocr group
+      group:
+        name: "{{ faxocr_group_name }}"
+
+    - name: create faxocr user
+      user:
+        name: "{{ faxocr_login_name }}"
+        group: "{{ faxocr_group_name }}"
+        groups: sudo,adm
+        shell: /bin/bash
+        password: "{{ secret.system.password.faxocr }}"
+
+    - name: change file owner of faxocr directory
+      file:
+        path: "{{ faxocr_home }}"
+        state: directory
+        owner: "{{ faxocr_login_name }}"
+        group: "{{ faxocr_group_name }}"
+        recurse: yes
+
+    - name: change directory mode of faxocr directory
+      file:
+        path: "{{ faxocr_home }}"
+        state: directory
+        mode: 0755
+
+    - name: install profile
+      template:
+        dest: "{{ faxocr_home }}.profile"
+        src: dot-profile
+        owner: "{{ faxocr_login_name }}"
+        group: "{{ faxocr_group_name }}"
+        mode: 0644
+
+  tags:
+    - faxocr

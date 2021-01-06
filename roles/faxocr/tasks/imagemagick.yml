@@ -1,0 +1,24 @@
+---
+- block:
+    - name: install imagemagick package
+      apt:
+        name: imagemagick
+
+    - name: get a path name of policy.xml file of imagemagick
+      shell: |
+        ls /etc/ImageMagick/policy.xml || \
+        ls /etc/ImageMagick-6/policy.xml
+      changed_when: false
+      failed_when: false
+      register: imagemagick_policy_file
+
+    - name: authorize PDF files for imagemagick
+      lineinfile:
+        path: "{{ imagemagick_policy_file.stdout }}"
+        regexp: 'pattern="PDF"'
+        line: '  <policy domain="coder" rights="read|write" pattern="PDF" />'
+        backup: yes
+      when: imagemagick_policy_file.stdout
+
+  tags:
+    - imagemagick

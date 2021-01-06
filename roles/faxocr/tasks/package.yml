@@ -1,0 +1,29 @@
+---
+- block:
+    - name: install packages required by FaxOCR
+      apt:
+        name:
+          - netpbm
+          - xvfb
+          - unoconv
+          - sendemail
+          - mpack
+          - zip
+
+    - name: include OS-specific package names
+      include_vars: "{{ item }}"
+      with_first_found:
+        - files:
+            - package-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml
+            - package-{{ ansible_distribution }}.yml
+            - package-{{ ansible_os_family }}.yml
+          skip: true
+
+    - name: install packages depending on OS
+      apt:
+        name: "{{ faxocr_os_dependent_packages }}"
+
+    - import_tasks: package-pdftools.yml
+
+  tags:
+    - faxocr-package

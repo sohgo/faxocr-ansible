@@ -1,0 +1,35 @@
+---
+- block:
+    - name: install fonts required by FaxOCR
+      apt:
+        name:
+          - fonts-takao
+          - fonts-vlgothic
+
+    - name: install conf files for fonts
+      template:
+        dest: /etc/fonts/conf.avail
+        src: "{{ item }}"
+        owner: root
+        group: root
+        mode: 0644
+      with_items:
+        - 65-fonts-takao-gothic.conf
+        - 65-fonts-takao-mincho.conf
+        - 65-fonts-takao-pgothic.conf
+        - 69-msfonts-to-takao.conf
+
+    - name: create symbolic links for font config files
+      file:
+        dest: /etc/fonts/conf.d/{{ item }}
+        src: /etc/fonts/conf.avail/{{ item }}
+        state: link
+      with_items:
+        - 65-fonts-takao-gothic.conf
+        - 65-fonts-takao-mincho.conf
+        - 65-fonts-takao-pgothic.conf
+        - 69-msfonts-to-takao.conf
+      notify: update font cache
+
+  tags:
+    - font

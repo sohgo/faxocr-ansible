@@ -1,0 +1,50 @@
+---
+# tasks file for roles/docker
+- name: create a docker image from all-in-one faxocr container
+  command:
+    argv:
+      - docker
+      - commit
+      - "{{ docker_container_name }}"
+      - "{{ docker_hub_repository_name }}/{{ docker_hub_image_name }}:{{ docker_image_version }}"
+
+- name: create a docker container for all-in-one faxocr image
+  docker_container:
+    name: "{{ docker_container_name }}-tmp"
+    image: "{{ docker_hub_repository_name }}/{{ docker_hub_image_name }}:{{ docker_image_version }}"
+    state: present
+    exposed_ports: "{{ docker_exposed_ports }}"
+    user: faxocr
+    command: /start
+
+- name: create a faxocr-allinone docker image for uploading
+  command:
+    argv:
+      - docker
+      - commit
+      - "{{ docker_container_name }}-tmp"
+      - "{{ docker_hub_repository_name }}/{{ docker_hub_image_name }}:{{ docker_hub_image_tag }}"
+
+- name: remove temporary container for "{{ docker_container_name }}-tmp"
+  docker_container:
+    name: "{{ docker_container_name }}-tmp"
+    state: absent
+
+- name: remove temporary docker image
+  docker_image:
+    name: "{{ docker_hub_repository_name }}/{{ docker_hub_image_name }}:{{ docker_image_version }}"
+    source: local
+    state: absent
+
+- name: remove the docker container for all-in-one faxocr
+  docker_container:
+    name: "{{ docker_container_name }}"
+    state: absent
+
+- name: push faxocr-allinone image to dockerhub
+  docker_image:
+    name: "{{ docker_hub_repository_name }}/{{ docker_hub_image_name }}:{{ docker_hub_image_tag }}"
+    repository: "{{ docker_hub_repository_name }}/{{ docker_hub_image_name }}:{{ docker_hub_image_tag }}"
+    push: yes
+    source: local
+  when: none

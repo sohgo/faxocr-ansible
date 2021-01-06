@@ -1,0 +1,4 @@
+---
+# defaults file for role/database
+# use u5f8mb4 for mysql 5.7 or later, use utf8 for other
+mysql_character_set: utf8mb4

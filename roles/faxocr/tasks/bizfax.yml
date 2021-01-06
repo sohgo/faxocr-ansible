@@ -1,0 +1,7 @@
+---
+- name: install packages required by bizfax-send
+  apt:
+    name:
+      - python-gtk2
+      - python-jswebkit
+      - libsoup2.4-dev

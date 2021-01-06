@@ -1,0 +1,6 @@
+[client]
+default-character-set={{ mysql_character_set }}
+
+[mysqld]
+character-set-server={{ mysql_character_set }}
+#skip-character-set-client-handshake

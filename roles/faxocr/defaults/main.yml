@@ -1,0 +1,22 @@
+---
+faxocr_login_name: faxocr
+faxocr_group_name: faxocr
+
+faxocr_home: /home/{{ faxocr_login_name }}/
+
+faxocr_repository: https://github.com/faxocr/faxocr
+
+cluscore_root: "{{ faxocr_home }}src/cluscore/"
+cluscore_repository: https://github.com/cluscore/cluscore.git
+cluscore_branch: master
+
+kocr_root: "{{ faxocr_home }}src/kocr/"
+kocr_repository: https://github.com/faxocr/kocr
+kocr_branch: master
+
+sheetreader_root: "{{ faxocr_home }}src/sheet-reader/"
+sheetreader_repository: https://github.com/faxocr/sheet-reader
+sheetreader_branch: master
+
+srhelper_root: "{{ faxocr_home }}src/srhelper/"
+parallel_version: '20200522'
