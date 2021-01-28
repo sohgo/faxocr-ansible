@@ -1,5 +1,4 @@
 # Ansible playbook for all-in-one FaxOCR
-
 The playbook is designed to create an all-in-one FaxOCR on a variety of platforms. The FaxOCR consists of FaxOCR (Ruby on Rails), web server, mail server, and database server. The all-in-one FaxOCR contains all of them on a single platform.
 
 ## Target platforms
@@ -12,15 +11,15 @@ Supported platforms where FaxOCR will be set up
 - FaxOCR server
 - FaxOCR development environment with GUI
 
+## OS of target node running FaxOCR
+- Ubuntu 18.04 (amd64)
+
 ## Control node
 A tested environment of control node
 - Ubuntu 18.04 (amd64)
 - Ansible 2.9
 - Docker CE 19.03.13
 - LXD 3.0.3
-
-## OS of target node running FaxOCR
-- Ubuntu 18.04 (amd64)
 
 ## Installation
 ### Bare-metal, Virtual machine
@@ -34,7 +33,7 @@ Next, set up some on the control node
 ```		
 echo 'IP address or hostname (resolvable) of target node' > inventory/standalone
 ```		
-Apply playbook (Choose one of them)
+Apply playbook (Choose one of the followings)
 - FaxOCR server
 ```
 ansible-play -u deploy -i inventory/standalone standalone.yml
