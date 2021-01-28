@@ -8,6 +8,10 @@ Supported platforms where FaxOCR will be set up
 - LXD Container
 - Docker Container
 
+## Target types
+- FaxOCR server
+- FaxOCR development environment with GUI
+
 ## Control node
 A tested environment of control node
 - Ubuntu 18.04 (amd64)
@@ -30,10 +34,15 @@ Next, set up some on the control node
 ```		
 echo 'IP address or hostname (resolvable) of target node' > inventory/standalone
 ```		
-Apply playbook
-```		
-ansible-play -i inventory/standalone standalone.yml
-```		
+Apply playbook (Choose one of them)
+- FaxOCR server
+```
+ansible-play -u deploy -i inventory/standalone standalone.yml
+```
+- FaxOCR development environment with GUI
+```
+ansible-play -u deploy -i inventory/standalone gui.yml
+```
 
 ### LXD Container
 First, create a LXD container named faxocr-all-in-one (e.x.) using Ubuntu 18.04 on the control node
