@@ -10,13 +10,13 @@ Supported platforms where FaxOCR will be set up
 
 ## Control node
 A tested environment of control node
-- Ubuntu 18.04(amd64)
+- Ubuntu 18.04 (amd64)
 - Ansible 2.9
 - Docker CE 19.03.13
 - LXD 3.0.3
 
 ## OS of target node running FaxOCR
-- Ubuntu 18.04(amd64)
+- Ubuntu 18.04 (amd64)
 
 ## Installation
 ### Bare-metal, Virtual machine
@@ -28,7 +28,7 @@ First, set up target machine
 
 Next, set up some on the control node
 ```		
-echo 'IP address or hostname(resolvable) of target node' > inventory/standalone
+echo 'IP address or hostname (resolvable) of target node' > inventory/standalone
 ```		
 Apply playbook
 ```		
