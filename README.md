@@ -27,7 +27,7 @@ Clone this repository on the control node first.
 git clone --recursive https://github.com/faxocr/faxocr-ansible
 cd faxocr-ansible
 ```
-If you want to change initial password for system accounts, mysql accounts and etc, edit inventory/host_vars/secret.yml.
+If you want to change initial password for system accounts, mysql's accounts and etc, edit inventory/host_vars/secret.yml.
 
 ### Bare-metal, Virtual machine
 First, set up target machine
