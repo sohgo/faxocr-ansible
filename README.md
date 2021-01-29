@@ -9,7 +9,7 @@ Supported platforms where FaxOCR will be set up
 
 ## Target type
 - FaxOCR server
-- FaxOCR development environment with GUI
+- [FaxOCR development environment with GUI](https://sites.google.com/site/faxocr2010/home/ji-pc-de-tamesu)
 
 ## OS of target node running FaxOCR
 - Ubuntu 18.04 (amd64)
@@ -27,6 +27,7 @@ Clone this repository on the control node first.
 git clone --recursive https://github.com/faxocr/faxocr-ansible
 cd faxocr-ansible
 ```
+If you want to change initial password for system accounts, mysql accounts and etc, edit inventory/host_vars/secret.yml.
 
 ### Bare-metal, Virtual machine
 First, set up target machine
