@@ -29,7 +29,7 @@ cd faxocr-ansible
 ```
 If you want to change initial password for system accounts, mysql's accounts and etc, edit inventory/host_vars/secret.yml.
 
-### Bare-metal, Virtual machine
+### Bare-metal, virtual machine
 First, set up target machine
 - Install Ubuntu 18.04 (amd64)
 - Create an account (e.x. "deploy" in this document) for ansible
@@ -51,7 +51,7 @@ ansible-play -u deploy -i inventory/standalone standalone.yml
 ansible-play -u deploy -i inventory/standalone gui.yml
 ```
 
-### LXD Container
+### LXD container
 First, create a LXD container named faxocr-all-in-one (e.x.) using Ubuntu 18.04 on the control node
 ```
 faxocr_container_name=faxocr-all-in-one
@@ -63,7 +63,7 @@ Apply playbook
 ansible-play -c lxd -i inventory/standalone standalone.yml
 ```
 
-### Docker Container
+### Docker container
 Apply playbook
 ```
 ansible-play -i inventory/docker docker.yml
