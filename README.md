@@ -3,9 +3,9 @@ The playbook is designed to create an all-in-one FaxOCR on a variety of platform
 
 ## Target platform
 Supported platforms where FaxOCR will be set up
-- Bare-metal, Virtual Machine
-- LXD Container
-- Docker Container
+- Bare-metal, virtual Machine
+- LXD container
+- Docker container
 
 ## Target type
 - FaxOCR server
@@ -15,7 +15,7 @@ Supported platforms where FaxOCR will be set up
 - Ubuntu 18.04 (amd64)
 
 ## Control node
-A tested environment of control node
+Tested environment of control node
 - Ubuntu 18.04 (amd64)
 - Ansible 2.9
 - Docker CE 19.03.13
@@ -31,10 +31,11 @@ If you want to change initial password for system accounts, mysql's accounts and
 
 ### Bare-metal, Virtual machine
 First, set up target machine
-- Install Ubuntu 18.04
+- Install Ubuntu 18.04 (amd64)
 - Create an account (e.x. "deploy" in this document) for ansible
-- Place an authorized key of SSH for the deploy user in ~deploy/.ssh/authorized_keys
+- Install OpenSSH server and place an authorized key of SSH for the deploy user in ~deploy/.ssh/authorized_keys
 - Install sudo and set up sudoers without password or set login password of the deploy user
+- Install python3
 
 Next, set up some on the control node
 ```
