@@ -13,6 +13,7 @@ Supported platforms where FaxOCR will be set up
 
 ## OS of target node running FaxOCR
 - Ubuntu 18.04 (amd64)
+- Debian 10 (amd64)
 
 ## Control node
 Tested environment of control node
