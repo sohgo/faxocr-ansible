@@ -45,11 +45,11 @@ echo 'IP address or hostname (resolvable) of target node' > inventory/standalone
 Apply playbook (Choose one of the followings)
 - FaxOCR server
 ```
-ansible-play -u deploy -i inventory/standalone standalone.yml
+ansible-playbook -u deploy -i inventory/standalone standalone.yml
 ```
 - FaxOCR development environment with GUI
 ```
-ansible-play -u deploy -i inventory/standalone gui.yml
+ansible-playbook -u deploy -i inventory/standalone gui.yml
 ```
 
 ### LXD container
@@ -61,13 +61,13 @@ echo "$faxocr_container_name" > inventory/standalone
 ```
 Apply playbook
 ```
-ansible-play -c lxd -i inventory/standalone standalone.yml
+ansible-playbook -c lxd -i inventory/standalone standalone.yml
 ```
 
 ### Docker container
 Apply playbook
 ```
-ansible-play -i inventory/docker docker.yml
+ansible-playbook -i inventory/docker docker.yml
 ```
 After applying playbook, a docker image named faxocr-allinone will be created.
 
