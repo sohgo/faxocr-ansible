@@ -1,0 +1,34 @@
+name: apply
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      faxocr_branch_name:
+        description: faxocr branch name
+        required: true
+        default: develop-5
+      faxocr_repository_user_name:
+        description: faxocr repository user name
+        required: false
+env:
+  faxocr_branch: ${{ github.event.inputs.faxocr_branch_name || 'develop-5' }}
+  faxocr_repository: ${{ github.server_url }}/${{ github.event.inputs.faxocr_repository_user_name || github.actor }}/faxocr
+jobs:
+  lxd:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: ['ubuntu:18.04']
+    env:
+      lxd_container_name: faxocr-lxd
+    steps:
+      - uses: whywaita/setup-lxd@v1
+        with:
+          lxd_version: latest/stable
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - run: echo ${{ env.lxd_container_name }} > inventory/standalone
+      - run: lxc launch ${{ matrix.os }} ${{ env.lxd_container_name }}
+      - run: ansible-playbook -c lxd -i inventory/standalone standalone.yml -e 'faxocr_branch=${{ env.faxocr_branch }}' -e 'faxocr_repository=${{ env.faxocr_repository }}'

@@ -1,0 +1,53 @@
+name: deploy-dockerhub
+on:
+  workflow_dispatch:
+    inputs:
+      faxocr_branch_name:
+        description: Faxocr branch name
+        required: true
+        default: develop-5
+      faxocr_repository_user_name:
+        description: Faxocr repository user name
+        required: false
+      docker_hub_repository_name:
+        description: Docker hub repository name
+        required: true
+        default: faxocr-allinone
+      docker_hub_tag_name:
+        description: Docker hub tag name
+        required: true
+        default: latest
+      github_environment:
+        description: Github environment name
+        required: true
+        default: dockerhub
+      ignore_building_result_of_docker_image:
+        description: Ignore building result of docker image
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.github_environment }}
+    steps:
+      - name: Setup addtional modules for ansible
+        run: pipx inject ansible-core docker
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Login to Docker Hub
+        uses: actions-hub/docker/login@master
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_HUB_USER_NAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          DOCKER_REGISTRY_URL: docker.io
+      - name: Create faxocr docker image
+        run: ansible-playbook -i inventory/docker docker.yml -e 'faxocr_branch=${{ github.event.inputs.faxocr_branch_name }}' -e 'faxocr_repository=${{ github.server_url }}/${{ github.event.inputs.faxocr_repository_user_name || github.actor }}/faxocr' -e 'docker_hub_repository_name=${{ secrets.DOCKER_HUB_USER_NAME }}' -e 'docker_hub_image_name=${{ github.event.inputs.docker_hub_repository_name }}' -e 'docker_hub_image_tag=${{ github.event.inputs.docker_hub_tag_name }}' || ${{ github.event.inputs.ignore_building_result_of_docker_image || 'false' }}
+      - name: Deploy faxocr all-in-one docker image to docker hub
+        uses: actions-hub/docker@master
+        with:
+          args: push ${{ secrets.DOCKER_HUB_USER_NAME }}/${{ github.event.inputs.docker_hub_repository_name }}:${{ github.event.inputs.docker_hub_tag_name }}
